@@ -4,33 +4,60 @@
 
     <form @submit.prevent="submitForm">
       <div>
-        <label>Nom</label>
-        <input v-model="form.lastName" type="text" required />
+        <label for="lastName">Nom</label>
+        <input
+          id="lastName"
+          v-model="form.lastName"
+          name="lastName"
+          type="text"
+          required
+        />
       </div>
 
       <div>
-        <label>Prénom</label>
-        <input v-model="form.firstName" type="text" required />
+        <label for="firstName">Prénom</label>
+        <input
+          id="firstName"
+          v-model="form.firstName"
+          name="firstName"
+          type="text"
+          required
+        />
       </div>
 
       <div>
-        <label>Date</label>
-        <input v-model="form.birthDate" type="date" required />
+        <label for="birthDate">Date</label>
+        <input
+          id="birthDate"
+          v-model="form.birthDate"
+          name="birthDate"
+          type="date"
+          required
+        />
       </div>
 
       <div>
-        <label>Type de vaccin</label>
-        <select v-model="form.vaccineType" required>
-          <option disabled value="">Choisir</option>
+        <label for="vaccineType">Type de vaccin</label>
+        <select
+          id="vaccineType"
+          v-model="form.vaccineType"
+          name="vaccineType"
+          required
+        >
           <option value="Rabique">Rabique</option>
           <option value="VZV">VZV</option>
           <option value="Hepatite B">Hépatite B</option>
         </select>
       </div>
 
-      <div>
+      <div class="reminder-div">
         <label>
-          <input type="checkbox" v-model="form.reminder" />
+          <input
+            id="reminder"
+            v-model="form.reminder"
+            name="reminder"
+            type="checkbox"
+          />
           Rappel
         </label>
       </div>
@@ -43,28 +70,37 @@
 
 <script setup lang="ts">
 /* eslint-disable no-undef */
-import { reactive, computed } from "vue";
-import type { Patient } from "@/types/Patient";
+import { reactive, computed, watch } from "vue";
+import type { Patient, PatientPayload } from "@/types/Patient";
 
 const props = defineProps<{
   patient?: Patient | null;
 }>();
 
 const emit = defineEmits<{
-  (e: "save", patient: Patient): void;
+  (e: "save", patient: PatientPayload): void;
   (e: "cancel"): void;
 }>();
 
-const isEditing = computed(() => !!props.patient);
-
-const form = reactive<Patient>({
-  id: props.patient?.id ?? Date.now(),
-  firstName: props.patient?.firstName ?? "",
-  lastName: props.patient?.lastName ?? "",
-  birthDate: props.patient?.birthDate ?? "",
-  vaccineType: props.patient?.vaccineType ?? "Rabique",
-  reminder: props.patient?.reminder ?? false,
+const blankPatient = (): PatientPayload => ({
+  id: undefined,
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  vaccineType: "Rabique",
+  reminder: false,
 });
+
+const isEditing = computed(() => !!props.patient);
+const form = reactive<PatientPayload>(blankPatient());
+
+watch(
+  () => props.patient,
+  (patient) => {
+    Object.assign(form, patient ?? blankPatient());
+  },
+  { immediate: true }
+);
 
 function submitForm() {
   emit("save", { ...form });
@@ -78,5 +114,30 @@ function submitForm() {
 
 form div {
   margin-bottom: 10px;
+}
+form label {
+  display: block;
+  margin-bottom: 4px;
+}
+form input,
+form select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+form button {
+  margin-right: 10px;
+  padding: 8px 16px;
+}
+.reminder-div {
+  display: flex;
+  align-items: center;
+}
+.reminder-div label {
+  display: flex;
+  align-items: center;
+}
+.reminder-div input {
+  margin-right: 6px;
 }
 </style>

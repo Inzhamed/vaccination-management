@@ -1,26 +1,36 @@
 import axios from "axios";
-import type { Patient } from "@/types/Patient";
+import type { Patient, PatientPayload } from "@/types/Patient";
 
-const API_URL = "https://mock-api.local/patients";
+const API_URL = process.env.VUE_APP_API_URL || "http://localhost:3001";
+
+const http = axios.create({
+  baseURL: API_URL,
+});
 
 export async function fetchPatients(): Promise<Patient[]> {
-  // Mock data
-  return Promise.resolve([
-    {
-      id: 1,
-      firstName: "Ali",
-      lastName: "Benali",
-      birthDate: "1995-06-10",
-      vaccineType: "Rabique",
-      reminder: true,
-    },
-  ]);
+  const { data } = await http.get<Patient[]>("/patients");
+  return data;
 }
 
-export async function savePatient(patient: Patient): Promise<Patient> {
-  return Promise.resolve(patient);
+export async function fetchPatientById(id: number): Promise<Patient> {
+  const { data } = await http.get<Patient>(`/patients/${id}`);
+  return data;
+}
+
+export async function createPatient(payload: PatientPayload): Promise<Patient> {
+  const { data } = await http.post<Patient>("/patients", payload);
+  return data;
+}
+
+export async function updatePatient(payload: PatientPayload): Promise<Patient> {
+  if (!payload.id) {
+    throw new Error("Identifiant requis pour la mise à jour");
+  }
+
+  const { data } = await http.put<Patient>(`/patients/${payload.id}`, payload);
+  return data;
 }
 
 export async function deletePatientById(id: number): Promise<void> {
-  return Promise.resolve();
+  await http.delete(`/patients/${id}`);
 }

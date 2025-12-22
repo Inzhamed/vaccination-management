@@ -6,3 +6,5 @@ export interface Patient {
   vaccineType: "Rabique" | "VZV" | "Hepatite B";
   reminder: boolean;
 }
+
+export type PatientPayload = Omit<Patient, "id"> & { id?: number };
