@@ -35,7 +35,5 @@ VUE_APP_API_URL=http://mon-api:3001
 ## Tests & couverture
 
 ```bash
-npm run test:unit -- --coverage
+npm run test:unit 
 ```
-
-Le rapport de couverture est généré dans `coverage/`.
