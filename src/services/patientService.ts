@@ -3,7 +3,7 @@ import type { Patient, PatientPayload } from "@/types/Patient";
 
 const API_URL = process.env.VUE_APP_API_URL || "http://localhost:3001";
 
-const http = axios.create({
+export const http = axios.create({
   baseURL: API_URL,
 });
 
